@@ -1,33 +1,28 @@
 trigger:
- - main
+  - main
+  - releases/*
 
 strategy:
   matrix:
-    linux:
+    jdk10_linux:
       imageName: "ubuntu-latest"
-    mac:
-      imageName: "macOS-latest"
-    windows:
+      jdkVersion: '1.10'
+    jdk11_windows:
       imageName: "windows-latest"
-  maxParallel: 3
+      jdkVersion: '1.118'
+  maxParallel: 2
 
 pool:
   vmImage: $(imageName)
 
- steps:
- - task: Maven@4
-   inputs:
-     mavenPomFile: 'pom.xml'
-     mavenOptions: '-Xmx3072m'
-     javaHomeOption: 'JDKVersion'
-     jdkVersionOption: '1.11'
-     jdkArchitectureOption: 'x64'
-     publishJUnitResults: false
-     testResultsFiles: '**/surefire-reports/TEST-*.xml'
-     goals: 'package'
-task: PublishCodeCoverageResults@1
+steps:
+- task: Maven@4
   inputs:
-    codeCoverageTool: "JaCoCo"
-    summaryFileLocation: "$(System.DefaultWorkingDirectory)/**/site/jacoco/jacoco.xml"
-    reportDirectory: "$(System.DefaultWorkingDirectory)/**/site/jacoco"
-    failIfCoverageEmpty: true
+    mavenPomFile: "pom.xml"
+    mavenOptions: "-Xmx3072m"
+    javaHomeOption: "JDKVersion"
+    jdkVersionOption: "1.10"
+    jdkArchitectureOption: "x64"
+    publishJUnitResults: true
+    testResultsFiles: "**/TEST-*.xml"
+    goals: "package"
